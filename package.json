@@ -1,0 +1,26 @@
+{
+  "name": "tstrees",
+  "version": "0.0.0",
+  "description": "De las estructuras de datos (TDA) mas poderosas en el manejo de la información, los arboles binarios, ternarios, n-arios de búsqueda resultan ser de las más atractivas. TsTrees implementan dichas estructuras en typescript para su satisfacción.",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib",
+    "src": "src"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "",
+    "dev": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PabloLionel/tstrees.git"
+  },
+  "keywords": [],
+  "author": "Benitez, Pablo L.",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/PabloLionel/tstrees/issues"
+  },
+  "homepage": "https://github.com/PabloLionel/tstrees#readme"
+}
