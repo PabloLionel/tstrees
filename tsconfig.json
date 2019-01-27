@@ -1,0 +1,39 @@
+{
+    "locate": "es",
+    // "compileOnSave": true, // Al establecer una compileOnSaveseñal para generar todos los archivos
+    "compilerOptions": {
+        // "module": "none",
+        "allowJs": true,
+        "target": "es5",
+        "downlevelIteration": true,
+        "lib": [
+            "dom",
+            "es5",
+            "es2015.collection",
+            "es2015.iterable"
+        ],
+        "sourceMap": true,
+        "removeComments": true,
+        // 
+        "strict": true, // habilita: --noImplicitAny, --noImplicitThis, --alwaysStrict, --strictBindCallApply, --strictNullChecks, --strictFunctionTypes y --strictPropertyInitialization.
+        // 
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        // 
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": false,
+        "preserveConstEnums": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true // opcion experimental
+        // tipos externos
+        // "typeRoots" : [],
+        // "types" : []// ejemplo: ["node", "lodash", "express"]
+    },
+    "include": [
+        "./src/**/*.ts",
+        "./test/**/*.ts",
+    ],
+    "exclude": ["node_modules"]
+}
