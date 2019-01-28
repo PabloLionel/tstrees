@@ -10,21 +10,39 @@
     <script src="tstrees.js"></script>
     <script>
         const tree = new Tt.Tree()
-        for (let i = 0; i < 1000; ++i) 
-            tree.add(Math.random())
-        console.log(tree.toArray())
+        for (let i = 0; i < 1000; ++i) tree.add(Math.random())
+        let treeToArr = tree.toArray()
+        console.time("tree")
+        for (let i = 0; i < 1000; ++i) tree.del(treeToArr[i])
+        console.timeEnd("tree")
+        console.log(tree)
+        
         const avl = new Tt.TreeAVL()
-        for (let i = 0; i < 1000; ++i) 
-            avl.add(Math.random())
-        console.log(avl.toArray())
-        const rb = new Tt.TreeRedBlack()
-        for (let i = 0; i < 1000; ++i) 
-            rb.add(Math.random())
-        console.log(rb.toArray())
+        for (let i = 0; i < 1000; ++i) avl.add(Math.random())
+        let avlToArr = avl.toArray()
+        console.time("avl")
+        for (let i = 0; i < 1000; ++i) avl.del(avlToArr[i])
+        console.timeEnd("avl")
+        console.log(avl)
+        
         const splay = new Tt.SplayTree()
+        for (let i = 0; i < 1000; ++i) splay.add(Math.random())
+        let splayToArr = splay.toArray()
+        console.time("splay")
+        for (let i = 0; i < 1000; ++i) splay.del(splayToArr[i])
+        console.timeEnd("splay")
+        console.log(splay)
+        
+        const rb = new Tt.TreeRedBlack()
+        for (let i = 0; i < 1000; ++i) rb.add(Math.random())
+        let rbToArr = rb.toArray()
+        console.time("rb")
         for (let i = 0; i < 1000; ++i) 
-            splay.add(Math.random())
-        console.log(splay.toArray())
+        {
+            console.log(i)    
+            rb.del(rbToArr[i])
+        }
+        console.timeEnd("rb")
     </script>
 </body>
 </html>

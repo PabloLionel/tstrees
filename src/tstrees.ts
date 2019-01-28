@@ -1,5 +1,5 @@
 namespace Tt {
-    export enum OrdenRecorrido {
+    export enum travelMode {
         PREORDER,
         INORDER,
         POSTORDER
@@ -29,7 +29,7 @@ namespace Tt {
         contains(v: T)  : boolean, //util para saber si un valor se encuentra en el árbol
         traverse(
             process     : Function,
-            order       : OrdenRecorrido
+            order       : travelMode
         )               : void,// recorrer todo el árbol, segun sea el valor de order, y obtener los valores de cada nodo a los cuales aplica el callback
         size()          : number,
         toArray()       : Array<T>,
@@ -83,15 +83,15 @@ namespace Tt {
         contains(v: T): boolean {
             return this._contains(v, this.root)
         }
-        traverse(process: Function, order: OrdenRecorrido = OrdenRecorrido.INORDER): void {
+        traverse(process: Function, order: travelMode = travelMode.INORDER): void {
             switch (order) {
-                case OrdenRecorrido.PREORDER:
+                case travelMode.PREORDER:
                     this.preOrder(process, this.root)
                     break
-                case OrdenRecorrido.INORDER:
+                case travelMode.INORDER:
                     this.inOrder(process, this.root)
                     break
-                case OrdenRecorrido.POSTORDER:
+                case travelMode.POSTORDER:
                     this.postOrder(process, this.root)
             }
         }
@@ -182,8 +182,6 @@ namespace Tt {
             return this._right
         }
     }
-
-    // Tree
     export class Tree<T> extends TreeBinaryAbstract<T> {
         // de correr en un servidor, hacemos asignación temprana.
         private _root: INode<T> | null = null
@@ -453,11 +451,11 @@ namespace Tt {
     }
     class NodeRedBlack<T> implements INodeRedBlack<T> {
         constructor(
-            private _value: T,
-            private _left: INodeRedBlack<T> | null = null,
-            private _right: INodeRedBlack<T> | null = null,
-            private _parent: INodeRedBlack<T> | null = null,
-            private _color: Color = Color.RED
+            private _value  : T,
+            private _color  : Color = Color.RED,
+            private _parent : INodeRedBlack<T> | null = null,
+            private _left   : INodeRedBlack<T> | null = null,
+            private _right  : INodeRedBlack<T> | null = null
         ) { }
         set value(v: T) {
             this._value = v
@@ -496,15 +494,9 @@ namespace Tt {
         }
         private _root: INodeRedBlack<T> | null = null
         private _size: number = 0
-        constructor(compare?: Function) {
-            super(compare)
-        }
-        set root(node: INodeRedBlack<T> | null) {
-            this._root = node
-        }
-        get root(): INodeRedBlack<T> | null {
-            return this._root
-        }
+        constructor(compare?: Function) { super(compare) }
+        set root(node: INodeRedBlack<T> | null) { this._root = node }
+        get root(): INodeRedBlack<T> | null { return this._root }
         /** 
          * Simple rotation on the left
          * Left-rotates node x on tree T.
@@ -638,6 +630,7 @@ namespace Tt {
             return this
         }
         private remove_fixup(x: INodeRedBlack<T>) {
+            if (!x) return
             while (x != this.root && x.color == Color.BLACK)
                 if (x == x.parent!.left) {
                     let w = x.parent!.right
@@ -699,9 +692,9 @@ namespace Tt {
                 u.parent.right = v
         }
         private remove(z: INodeRedBlack<T>) {
-            let y: any = z
-            let ycolor = z.color
-            let x
+            let y: any = z,
+            ycolor = z.color,
+            x
             if (!z.left) {
                 x = z.right
                 this.transplat(z, z.right!)
@@ -730,6 +723,7 @@ namespace Tt {
         del(v: T): TreeRedBlack<T> {
             let x = this.root,
                 x_cmp;
+            // debugger
             while (x) {
                 x_cmp = this.cmp(x.value)
                 if (v < x_cmp)
@@ -820,10 +814,9 @@ namespace Tt {
 
         del(v: T): SplayTree<T> {
             this.splay(v)
-            if (v != this.root!.value) {
-                console.warn('key not found in tree')
+            if (v != this.root!.value) 
                 return this
-            }
+            
             this._size--
             // Now delete the root.
             if (!this.root!.left)
@@ -868,17 +861,17 @@ namespace Tt {
                 return null
             return this.root
         }
-        private splay(value: T) {
+        private splay(v: T) {
             let l: any = this.header
             let r: any = this.header
             let t: any = this.root
             this.header.left = null
             this.header.right = null
             while (1)
-                if (value < this.cmp(t!.value)) {
+                if (v < this.cmp(t!.value)) {
                     if (!t.left)
                         break
-                    if (value < this.cmp(t!.left!.value)) {
+                    if (v < this.cmp(t!.left!.value)) {
                         let y = t!.left
                         t!.left = y!.right
                         y.right = t
@@ -889,10 +882,10 @@ namespace Tt {
                     r.left = t
                     r = t
                     t = t!.left
-                } else if (value > this.cmp(t!.value)) {
+                } else if (v > this.cmp(t!.value)) {
                     if (!t!.right)
                         break
-                    if (value > this.cmp(t!.right.value)) {
+                    if (v > this.cmp(t!.right.value)) {
                         let y = t.right
                         t.right = y.left
                         y.left = t

@@ -11,12 +11,12 @@ var __extends = (this && this.__extends) || (function () {
 })();
 var Tt;
 (function (Tt) {
-    var OrdenRecorrido;
-    (function (OrdenRecorrido) {
-        OrdenRecorrido[OrdenRecorrido["PREORDER"] = 0] = "PREORDER";
-        OrdenRecorrido[OrdenRecorrido["INORDER"] = 1] = "INORDER";
-        OrdenRecorrido[OrdenRecorrido["POSTORDER"] = 2] = "POSTORDER";
-    })(OrdenRecorrido = Tt.OrdenRecorrido || (Tt.OrdenRecorrido = {}));
+    var travelMode;
+    (function (travelMode) {
+        travelMode[travelMode["PREORDER"] = 0] = "PREORDER";
+        travelMode[travelMode["INORDER"] = 1] = "INORDER";
+        travelMode[travelMode["POSTORDER"] = 2] = "POSTORDER";
+    })(travelMode = Tt.travelMode || (Tt.travelMode = {}));
     var TreeBinaryAbstract = (function () {
         function TreeBinaryAbstract(compare) {
             this._cmp = function (val) { return val; };
@@ -62,15 +62,15 @@ var Tt;
             return this._contains(v, this.root);
         };
         TreeBinaryAbstract.prototype.traverse = function (process, order) {
-            if (order === void 0) { order = OrdenRecorrido.INORDER; }
+            if (order === void 0) { order = travelMode.INORDER; }
             switch (order) {
-                case OrdenRecorrido.PREORDER:
+                case travelMode.PREORDER:
                     this.preOrder(process, this.root);
                     break;
-                case OrdenRecorrido.INORDER:
+                case travelMode.INORDER:
                     this.inOrder(process, this.root);
                     break;
-                case OrdenRecorrido.POSTORDER:
+                case travelMode.POSTORDER:
                     this.postOrder(process, this.root);
             }
         };
@@ -443,7 +443,7 @@ var Tt;
             throw new Error("Method not implemented.");
         };
         TreeAVL.prototype.size = function () {
-            var size = 1;
+            var size = 0;
             _super.prototype.traverse.call(this, function () {
                 size++;
             });
@@ -533,12 +533,8 @@ var Tt;
             throw new Error("Method not implemented.");
         };
         Object.defineProperty(TreeRedBlack.prototype, "root", {
-            get: function () {
-                return this._root;
-            },
-            set: function (node) {
-                this._root = node;
-            },
+            get: function () { return this._root; },
+            set: function (node) { this._root = node; },
             enumerable: true,
             configurable: true
         });
@@ -642,6 +638,8 @@ var Tt;
             return this;
         };
         TreeRedBlack.prototype.remove_fixup = function (x) {
+            if (!x)
+                return;
             while (x != this.root && x.color == Color.BLACK)
                 if (x == x.parent.left) {
                     var w = x.parent.right;
@@ -706,9 +704,7 @@ var Tt;
                 u.parent.right = v;
         };
         TreeRedBlack.prototype.remove = function (z) {
-            var y = z;
-            var ycolor = z.color;
-            var x;
+            var y = z, ycolor = z.color, x;
             if (!z.left) {
                 x = z.right;
                 this.transplat(z, z.right);
@@ -840,10 +836,8 @@ var Tt;
         };
         SplayTree.prototype.del = function (v) {
             this.splay(v);
-            if (v != this.root.value) {
-                console.warn('key not found in tree');
+            if (v != this.root.value)
                 return this;
-            }
             this._size--;
             if (!this.root.left)
                 this.root = this.root.right;
@@ -887,17 +881,17 @@ var Tt;
                 return null;
             return this.root;
         };
-        SplayTree.prototype.splay = function (value) {
+        SplayTree.prototype.splay = function (v) {
             var l = this.header;
             var r = this.header;
             var t = this.root;
             this.header.left = null;
             this.header.right = null;
             while (1)
-                if (value < this.cmp(t.value)) {
+                if (v < this.cmp(t.value)) {
                     if (!t.left)
                         break;
-                    if (value < this.cmp(t.left.value)) {
+                    if (v < this.cmp(t.left.value)) {
                         var y = t.left;
                         t.left = y.right;
                         y.right = t;
@@ -909,10 +903,10 @@ var Tt;
                     r = t;
                     t = t.left;
                 }
-                else if (value > this.cmp(t.value)) {
+                else if (v > this.cmp(t.value)) {
                     if (!t.right)
                         break;
-                    if (value > this.cmp(t.right.value)) {
+                    if (v > this.cmp(t.right.value)) {
                         var y = t.right;
                         t.right = y.left;
                         y.left = t;
