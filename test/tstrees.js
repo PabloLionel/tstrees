@@ -24,12 +24,8 @@ var Tt;
                 this._cmp = compare;
         }
         Object.defineProperty(TreeBinaryAbstract.prototype, "cmp", {
-            get: function () {
-                return this._cmp;
-            },
-            set: function (v) {
-                this._cmp = v;
-            },
+            get: function () { return this._cmp; },
+            set: function (v) { this._cmp = v; },
             enumerable: true,
             configurable: true
         });
@@ -138,6 +134,24 @@ var Tt;
         };
         TreeBinaryAbstract.prototype.isEmpty = function () {
             return !this.root;
+        };
+        TreeBinaryAbstract.prototype.printRow = function (root, prefix, isTail, out, printNode) {
+            if (root) {
+                out(("" + prefix + (isTail ? '└── ' : '├── ') + (printNode(root.value)) + "\n"));
+                var indent = prefix + (isTail ? '    ' : '│   ');
+                if (root.left) {
+                    this.printRow(root.left, indent, false, out, printNode);
+                }
+                if (root.right) {
+                    this.printRow(root.right, indent, true, out, printNode);
+                }
+            }
+        };
+        TreeBinaryAbstract.prototype.toString = function (printNode) {
+            if (printNode === void 0) { printNode = this._cmp; }
+            var out = [];
+            this.printRow(this.root, '', true, function (v) { return out.push(v); }, printNode);
+            return out.join('');
         };
         return TreeBinaryAbstract;
     }());

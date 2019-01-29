@@ -22,21 +22,22 @@ namespace Tt {
                     null
     interface ITree<T> { // N: type node
         cmp: Function,
-        add(v: T)       : ITree<T>,
-        del(v: T)       : ITree<T>,
-        pop(v: T)       : T,// ademas de remover un nodo devuelve su contendio
-        find(v: T)      : INODE, // any: cualquier tipo de INodo(nodo, avl, rb, splay, ...)
-        contains(v: T)  : boolean, //util para saber si un valor se encuentra en el árbol
+        add(v: T)               : ITree<T>,
+        del(v: T)               : ITree<T>,
+        pop(v: T)               : T,// ademas de remover un nodo devuelve su contendio
+        find(v: T)              : INODE, // any: cualquier tipo de INodo(nodo, avl, rb, splay, ...)
+        contains(v: T)          : boolean, //util para saber si un valor se encuentra en el árbol
         traverse(
-            process     : Function,
-            order       : travelMode
-        )               : void,// recorrer todo el árbol, segun sea el valor de order, y obtener los valores de cada nodo a los cuales aplica el callback
-        size()          : number,
-        toArray()       : Array<T>,
-        toJson()        : Object,
-        min(n?: any)    : any,// valor minimo
-        max(n?: any)    : any,// valor maximo
-        isEmpty()       : boolean
+            process             : Function,
+            order               : travelMode
+        )                       : void,// recorrer todo el árbol, segun sea el valor de order, y obtener los valores de cada nodo a los cuales aplica el callback
+        size()                  : number,
+        toArray()               : Array<T>,
+        toJson()                : Object,
+        min(n?: any)            : any,// valor minimo
+        max(n?: any)            : any,// valor maximo
+        isEmpty()               : boolean,
+        toString(fn?: Function) : string
     }
     abstract class TreeBinaryAbstract<T> implements ITree<T> {
         private _cmp: Function = (val: T) => val // default comaprator
@@ -49,12 +50,8 @@ namespace Tt {
         abstract del(v: T)  : any
         abstract pop(v: T)  : T
         abstract size()     : number
-        set cmp(v: Function) {
-            this._cmp = v
-        }
-        get cmp(): Function {
-            return this._cmp
-        }
+        set cmp(v: Function) { this._cmp = v }
+        get cmp(): Function { return this._cmp }
         private _find(v: T, p: INODE): INODE {
             if (!p)
                 return null
@@ -155,6 +152,36 @@ namespace Tt {
         }
         isEmpty(): boolean {
             return !this.root
+        }
+        /**
+         * Prints level of the tree
+         * @param  {Node}                        root
+         * @param  {String}                      prefix
+         * @param  {Boolean}                     isTail
+         * @param  {Array<string>}               out
+         * @param  {Function(node:Node):String}  printNode
+         */
+        private printRow (
+            root        : INODE, 
+            prefix      : string, 
+            isTail      : boolean, 
+            out         : Function, 
+            printNode   : Function) {
+            if (root) {
+                out(("" + prefix + (isTail ? '└── ' : '├── ') + (printNode(root.value)) + "\n"));
+                var indent = prefix + (isTail ? '    ' : '│   ');
+                if (root.left)  { this.printRow(root.left,  indent, false, out, printNode); }
+                if (root.right) { this.printRow(root.right, indent, true,  out, printNode); }
+            }
+        }
+        /**
+         * @param{NodePrinter=} printNode
+         * @return {String}
+         */
+        toString (printNode: Function = this._cmp): string {
+            let out: T[] = [];
+            this.printRow(this.root, '', true, (v: T) => out.push(v), printNode);
+            return out.join('');
         }
     }
     class Node<T> implements INode<T> {
