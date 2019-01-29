@@ -458,16 +458,16 @@ var Tt;
         Color[Color["RED"] = 1] = "RED";
     })(Color = Tt.Color || (Tt.Color = {}));
     var NodeRedBlack = (function () {
-        function NodeRedBlack(_value, _left, _right, _parent, _color) {
+        function NodeRedBlack(_value, _color, _parent, _left, _right) {
+            if (_color === void 0) { _color = Color.RED; }
+            if (_parent === void 0) { _parent = null; }
             if (_left === void 0) { _left = null; }
             if (_right === void 0) { _right = null; }
-            if (_parent === void 0) { _parent = null; }
-            if (_color === void 0) { _color = Color.RED; }
             this._value = _value;
+            this._color = _color;
+            this._parent = _parent;
             this._left = _left;
             this._right = _right;
-            this._parent = _parent;
-            this._color = _color;
         }
         Object.defineProperty(NodeRedBlack.prototype, "value", {
             get: function () {
@@ -546,7 +546,7 @@ var Tt;
             y.parent = x.parent;
             if (!x.parent)
                 this.root = y;
-            else if (x === x.parent.left)
+            else if (x == x.parent.left)
                 x.parent.left = y;
             else
                 x.parent.right = y;
@@ -568,64 +568,71 @@ var Tt;
             y.right = x;
             x.parent = y;
         };
-        TreeRedBlack.prototype.insert_fixup = function (x) {
-            while (x !== this.root && x.parent.color == Color.RED) {
-                if (x.parent === x.parent.parent.left) {
-                    var y = x.parent.parent.right;
-                    if (y && y.color == Color.RED) {
-                        x.parent.color = Color.BLACK;
-                        y.color = Color.BLACK;
-                        x.parent.parent.color = Color.RED;
-                        x = x.parent.parent;
+        TreeRedBlack.prototype.insert_fixup = function (z) {
+            var grandparent = null;
+            var parentpt = null;
+            while ((z != this.root) && (z.color != Color.BLACK) && (z.parent.color == Color.RED)) {
+                parentpt = z.parent;
+                grandparent = z.parent.parent;
+                if (parentpt == grandparent.left) {
+                    var uncle = grandparent.right;
+                    if (uncle != null && uncle.color == Color.RED) {
+                        grandparent.color = Color.RED;
+                        parentpt.color = Color.BLACK;
+                        uncle.color = Color.BLACK;
+                        z = grandparent;
                     }
                     else {
-                        if (x === x.parent.right) {
-                            x = x.parent;
-                            this.rotationLeft(x);
+                        if (z == parentpt.right) {
+                            this.rotationLeft(parentpt);
+                            z = parentpt;
+                            parentpt = z.parent;
                         }
-                        x.parent.color = Color.BLACK;
-                        x.parent.parent.color = Color.RED;
-                        this.rotationRight(x.parent.parent);
+                        this.rotationRight(grandparent);
+                        parentpt.color = Color.BLACK;
+                        grandparent.color = Color.RED;
+                        z = parentpt;
                     }
                 }
                 else {
-                    var y = x.parent.parent.left;
-                    if (y && y.color === Color.RED) {
-                        x.parent.color = Color.BLACK;
-                        y.color = Color.BLACK;
-                        x.parent.parent.color = Color.RED;
-                        x = x.parent.parent;
+                    var uncle = grandparent.left;
+                    if (uncle != null && uncle.color == Color.RED) {
+                        grandparent.color = Color.RED;
+                        parentpt.color = Color.BLACK;
+                        uncle.color = Color.BLACK;
+                        z = grandparent;
                     }
                     else {
-                        if (x === x.parent.left) {
-                            x = x.parent;
-                            this.rotationRight(x);
+                        if (z == parentpt.left) {
+                            this.rotationRight(parentpt);
+                            z = parentpt;
+                            parentpt = z.parent;
                         }
-                        x.parent.color = Color.BLACK;
-                        x.parent.parent.color = Color.RED;
-                        this.rotationLeft(x.parent.parent);
+                        this.rotationLeft(grandparent);
+                        parentpt.color = Color.BLACK;
+                        grandparent.color = Color.RED;
+                        z = parentpt;
                     }
                 }
             }
             this.root.color = Color.BLACK;
         };
         TreeRedBlack.prototype.insert = function (z) {
-            var y = null, x = this.root, z_cmp, x_cmp;
-            while (x) {
+            var y = null, x = this.root, zcmp = this.cmp(z.value), xcmp;
+            while (x != null) {
                 y = x;
-                z_cmp = this.cmp(z.value);
-                x_cmp = this.cmp(x.value);
-                if (z_cmp < x_cmp)
+                xcmp = this.cmp(x.value);
+                if (zcmp < xcmp)
                     x = x.left;
-                else if (z_cmp > x_cmp)
+                else if (zcmp > xcmp)
                     x = x.right;
                 else
                     return false;
             }
             z.parent = y;
-            if (!y)
+            if (y == null)
                 this.root = z;
-            else if (this.cmp(z.value) < this.cmp(y.value))
+            else if (z.value < y.value)
                 y.left = z;
             else
                 y.right = z;
@@ -637,112 +644,114 @@ var Tt;
                 this._size++;
             return this;
         };
+        TreeRedBlack.prototype.getColor = function (n) { return n ? n.color : Color.BLACK; };
+        TreeRedBlack.prototype.isBlack = function (n) { return this.getColor(n) == Color.BLACK; };
+        TreeRedBlack.prototype.isRed = function (n) { return this.getColor(n) == Color.RED; };
         TreeRedBlack.prototype.remove_fixup = function (x) {
             if (!x)
                 return;
-            while (x != this.root && x.color == Color.BLACK)
+            while (x != this.root && this.isBlack(x)) {
                 if (x == x.parent.left) {
                     var w = x.parent.right;
-                    if (w.color == Color.RED) {
+                    if (this.isRed(w)) {
                         w.color = Color.BLACK;
                         x.parent.color = Color.BLACK;
                         this.rotationLeft(x.parent);
                         w = x.parent.right;
                     }
-                    if (w.left.color == Color.BLACK && w.right.color == Color.BLACK) {
+                    if (w && this.isBlack(w.left) && this.isBlack(w.right)) {
                         w.color = Color.RED;
                         x = x.parent;
                     }
                     else {
-                        if (w.right.color == Color.BLACK) {
+                        if (w && this.isBlack(w.right)) {
                             w.left.color = Color.BLACK;
                             w.color = Color.RED;
                             this.rotationRight(w);
                             w = x.parent.right;
                         }
-                        w.color = x.parent.color;
-                        x.parent.color = Color.BLACK;
-                        w.right.color = Color.BLACK;
-                        this.rotationLeft(x.parent);
+                        if (w) {
+                            w.color = x.parent.color;
+                            x.parent.color = Color.BLACK;
+                            w.right.color = Color.BLACK;
+                            this.rotationLeft(x.parent);
+                        }
                         x = this.root;
                     }
                 }
                 else {
                     var w = x.parent.left;
-                    if (w.color === Color.RED) {
+                    if (this.isRed(w)) {
                         w.color = Color.BLACK;
                         x.parent.color = Color.BLACK;
                         this.rotationRight(x.parent);
                         w = x.parent.left;
                     }
-                    if (w.right.color === Color.BLACK && w.left.color == Color.BLACK) {
+                    if (w && this.isBlack(w.right) && this.isBlack(w.left)) {
                         w.color = Color.RED;
                         x = x.parent;
                     }
                     else {
-                        if (w.left.color == Color.BLACK) {
+                        if (w && this.isBlack(w.left)) {
                             w.right.color = Color.BLACK;
                             w.color = Color.RED;
                             this.rotationLeft(w);
                             w = x.parent.left;
                         }
-                        w.color = x.parent.color;
-                        x.parent.color = Color.BLACK;
-                        w.left.color = Color.BLACK;
-                        this.rotationRight(x.parent);
+                        if (w) {
+                            w.color = x.parent.color;
+                            x.parent.color = Color.BLACK;
+                            w.left.color = Color.BLACK;
+                            this.rotationRight(x.parent);
+                        }
                         x = this.root;
                     }
                 }
+            }
             x.color = Color.BLACK;
         };
         TreeRedBlack.prototype.transplat = function (u, v) {
-            if (!u.parent)
+            if (u.parent == null)
                 this.root = v;
-            else if (u === u.parent.left)
+            else if (u == u.parent.left)
                 u.parent.left = v;
             else
                 u.parent.right = v;
+            if (v != null)
+                v.parent = u.parent;
         };
         TreeRedBlack.prototype.remove = function (z) {
-            var y = z, ycolor = z.color, x;
-            if (!z.left) {
+            var y = z, yoc = z.color, x;
+            if (z.left == null) {
                 x = z.right;
                 this.transplat(z, z.right);
             }
-            else if (!z.right) {
+            else if (z.right == null) {
                 x = z.left;
                 this.transplat(z, z.left);
             }
             else {
                 y = this.min(z.right);
-                ycolor = y.color;
+                yoc = y.color;
                 x = y.right;
-                if (y.parent == z)
+                if (x && y.parent == z)
                     x.parent = y;
                 else {
                     this.transplat(y, y.right);
                     y.right = z.right;
-                    y.right.parent = y;
+                    if (y.right)
+                        y.right.parent = y;
                 }
                 this.transplat(z, y);
                 y.left = z.left;
                 y.left.parent = y;
                 y.color = z.color;
             }
-            if (ycolor == Color.BLACK)
+            if (yoc == Color.BLACK)
                 this.remove_fixup(x);
         };
         TreeRedBlack.prototype.del = function (v) {
-            var x = this.root, x_cmp;
-            while (x) {
-                x_cmp = this.cmp(x.value);
-                if (v < x_cmp)
-                    x = x.left;
-                else if (v > x_cmp)
-                    x = x.right;
-                else
-                    break;
-            }
+            var x = this.find(v);
             if (x) {
                 this.remove(x);
                 this._size--;

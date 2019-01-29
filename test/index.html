@@ -9,40 +9,46 @@
 <body>
     <script src="tstrees.js"></script>
     <script>
+        let arr = []
+        const max = 1000000
+        const min = 0
+        
+        console.log(`cantidad de elementos: ${max - min}`)
+
+        for (let i = 0; i < 1000; ++i) arr.push(Math.random())
+
         const tree = new Tt.Tree()
-        for (let i = 0; i < 1000; ++i) tree.add(Math.random())
-        let treeToArr = tree.toArray()
-        console.time("tree")
-        for (let i = 0; i < 1000; ++i) tree.del(treeToArr[i])
-        console.timeEnd("tree")
-        console.log(tree)
+        console.time("treeAlta")
+        for (let i = min; i < max; ++i) tree.add(arr[i])
+        console.timeEnd("treeAlta")
+        console.time("treeBaja")
+        for (let i = min; i < max; ++i) tree.del(arr[i])
+        console.timeEnd("treeBaja")
         
         const avl = new Tt.TreeAVL()
-        for (let i = 0; i < 1000; ++i) avl.add(Math.random())
-        let avlToArr = avl.toArray()
-        console.time("avl")
-        for (let i = 0; i < 1000; ++i) avl.del(avlToArr[i])
-        console.timeEnd("avl")
-        console.log(avl)
-        
-        const splay = new Tt.SplayTree()
-        for (let i = 0; i < 1000; ++i) splay.add(Math.random())
-        let splayToArr = splay.toArray()
-        console.time("splay")
-        for (let i = 0; i < 1000; ++i) splay.del(splayToArr[i])
-        console.timeEnd("splay")
-        console.log(splay)
+        console.time("avlAlta")
+        for (let i = min; i < max; ++i) avl.add(arr[i])
+        console.timeEnd("avlAlta")
+        console.time("avlBaja")
+        for (let i = min; i < max; ++i) avl.del(arr[i])
+        console.timeEnd("avlBaja")
         
         const rb = new Tt.TreeRedBlack()
-        for (let i = 0; i < 1000; ++i) rb.add(Math.random())
-        let rbToArr = rb.toArray()
-        console.time("rb")
-        for (let i = 0; i < 1000; ++i) 
-        {
-            console.log(i)    
-            rb.del(rbToArr[i])
-        }
-        console.timeEnd("rb")
+        console.time("rbAlta")
+        for (let i = min; i < max; ++i) rb.add(arr[i])
+        console.timeEnd("rbAlta")
+        console.time("rbBaja")
+        for (let i = min; i < max; ++i) rb.del(arr[i])
+        console.timeEnd("rbBaja")
+
+        const splay = new Tt.SplayTree()
+        console.time("splayAlta")
+        for (let i = min; i < max; ++i) splay.add(arr[i])
+        let splayToArr = splay.toArray()
+        console.timeEnd("splayAlta")
+        console.time("splayBaja")
+        for (let i = min; i < max; ++i) splay.del(arr[i])
+        console.timeEnd("splayBaja")
     </script>
 </body>
 </html>

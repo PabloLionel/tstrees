@@ -438,10 +438,7 @@ namespace Tt {
             return size
         }
     }
-    export enum Color {
-        BLACK,
-        RED
-    }
+    export enum Color { BLACK, RED }
     interface INodeRedBlack<T> {
         value: T,
         parent: INodeRedBlack<T> | null,
@@ -518,14 +515,19 @@ namespace Tt {
         private rotationLeft(x: INodeRedBlack<T> | null) {
             let y = x!.right
             x!.right = y!.left
-            if (y!.left) y!.left!.parent = x
+            
+            if (y!.left) 
+                y!.left!.parent = x
+            
             y!.parent = x!.parent
+            
             if (!x!.parent)
                 this.root = y
-            else if (x === x!.parent!.left)
+            else if (x == x!.parent!.left)
                 x!.parent!.left = y
             else
                 x!.parent!.right = y
+            
             y!.left = x
             x!.parent = y
         }
@@ -549,79 +551,103 @@ namespace Tt {
         private rotationRight(x: INodeRedBlack<T> | null) {
             let y = x!.left
             x!.left = y!.right
-            if (y!.right) y!.right!.parent = x
+            
+            if (y!.right) 
+                y!.right!.parent = x
+            
             y!.parent = x!.parent
+            
             if (!x!.parent)
                 this.root = y
             else if (x === x!.parent!.right)
                 x!.parent!.right = y
             else
                 x!.parent!.left = y
+            
             y!.right = x
             x!.parent = y
         }
-        private insert_fixup(x: INodeRedBlack<T> | null): void {
-            while (x !== this.root && x!.parent!.color == Color.RED) {
-                if (x!.parent === x!.parent!.parent!.left) {
-                    let y = x!.parent!.parent!.right
-                    if (y && y.color == Color.RED) {
-                        x!.parent!.color = Color.BLACK
-                        y.color = Color.BLACK
-                        x!.parent!.parent!.color = Color.RED
-                        x = x!.parent!.parent
+        private insert_fixup(z: INodeRedBlack<T> | null): void {
+            let grandparent = null;
+            let parentpt = null;
+
+            while((z!=this.root)&& (z!.color!= Color.BLACK) && (z!.parent!.color == Color.RED)) {
+                parentpt = z!.parent
+                grandparent = z!.parent!.parent
+
+                if(parentpt == grandparent!.left) {
+                    let uncle = grandparent!.right
+
+                    if(uncle!=null && uncle.color == Color.RED) {
+                        grandparent!.color = Color.RED
+                        parentpt!.color = Color.BLACK
+                        uncle.color = Color.BLACK
+                        z = grandparent
                     } else {
-                        if (x === x!.parent!.right) {
-                            x = x!.parent
-                            this.rotationLeft(x)
+                        if(z == parentpt!.right) {
+                            this.rotationLeft(parentpt)
+                            z = parentpt
+                            parentpt = z!.parent
                         }
-                        x!.parent!.color = Color.BLACK
-                        x!.parent!.parent!.color = Color.RED
-                        this.rotationRight(x!.parent!.parent)
+
+                        this.rotationRight(grandparent);
+                        parentpt!.color = Color.BLACK
+                        grandparent!.color = Color.RED
+                        z = parentpt
                     }
                 } else {
-                    let y = x!.parent!.parent!.left
-                    if (y && y.color === Color.RED) {
-                        x!.parent!.color = Color.BLACK
-                        y.color = Color.BLACK
-                        x!.parent!.parent!.color = Color.RED
-                        x = x!.parent!.parent
+                    let uncle = grandparent!.left
+
+                    if(uncle!=null && uncle.color == Color.RED) {
+                        grandparent!.color = Color.RED
+                        parentpt!.color = Color.BLACK
+                        uncle.color = Color.BLACK
+                        z = grandparent
                     } else {
-                        if (x === x!.parent!.left) {
-                            x = x!.parent
-                            this.rotationRight(x)
+                        if(z == parentpt!.left) {
+                            this.rotationRight(parentpt)
+                            z = parentpt
+                            parentpt = z!.parent
                         }
-                        x!.parent!.color = Color.BLACK
-                        x!.parent!.parent!.color = Color.RED
-                        this.rotationLeft(x!.parent!.parent)
+
+                        this.rotationLeft(grandparent)
+                        parentpt!.color = Color.BLACK
+                        grandparent!.color = Color.RED
+                        z = parentpt
                     }
                 }
             }
             this.root!.color = Color.BLACK
         }
-        private insert(z: INodeRedBlack<T> | null): boolean {
+        private insert(z: INodeRedBlack<T>): boolean {
+            // una iptimizacion seria resivir el valor a insertar y si todo sale bien ahí recien instanciar un nuevo nodo
             let y = null,
-                x = this.root,
-                z_cmp,
-                x_cmp
-            while (x) {
-                y = x
-                z_cmp = this.cmp(z!.value)
-                x_cmp = this.cmp(x.value)
-                if (z_cmp < x_cmp)
+            x = this.root,//root
+            zcmp = this.cmp(z.value),
+            xcmp
+            while (x!=null) {
+                y = x;
+                xcmp = this.cmp(x.value)
+                if (zcmp < xcmp)
                     x = x.left
-                else if (z_cmp > x_cmp)
+                else if (zcmp > xcmp)
                     x = x.right
-                else
-                    return false// throw new Error(`${z.value()} ya se encuentra cargado`)
+                else 
+                    return false
             }
-            z!.parent = y
-            if (!y)
+
+            z.parent = y;
+
+            if(y==null)
                 this.root = z
-            else if (this.cmp(z!.value) < this.cmp(y.value))
+
+            else if(z.value < y.value)
                 y.left = z
             else
                 y.right = z
-            this.insert_fixup(z)
+
+            this.insert_fixup(z);
+
             return true
         }
         add(v: T): TreeRedBlack<T> {
@@ -629,114 +655,128 @@ namespace Tt {
                 this._size++
             return this
         }
+        private getColor(n: INodeRedBlack<T> | null) { return n? n.color:Color.BLACK }
+        private isBlack(n: INodeRedBlack<T> | null) { return this.getColor(n) == Color.BLACK }
+        private isRed(n: INodeRedBlack<T> | null) { return this.getColor(n) == Color.RED }
         private remove_fixup(x: INodeRedBlack<T>) {
             if (!x) return
-            while (x != this.root && x.color == Color.BLACK)
-                if (x == x.parent!.left) {
+            while (x!=this.root && this.isBlack(x)) {
+                if (x==x.parent!.left) {
                     let w = x.parent!.right
-                    if (w!.color == Color.RED) {
+
+                    if (this.isRed(w)) {
                         w!.color = Color.BLACK
-                        x!.parent!.color = Color.BLACK
+                        x.parent!.color = Color.BLACK
                         this.rotationLeft(x.parent)
                         w = x.parent!.right
                     }
-                    if (w!.left!.color == Color.BLACK && w!.right!.color == Color.BLACK) {
+
+                    if (w && this.isBlack(w!.left) && this.isBlack(w!.right)) {
                         w!.color = Color.RED
-                        x = x!.parent!
+                        x = x.parent!
                     } else {
-                        if (w!.right!.color == Color.BLACK) {
+                        if (w && this.isBlack(w!.right)) {
                             w!.left!.color = Color.BLACK
                             w!.color = Color.RED
                             this.rotationRight(w)
-                            w = x!.parent!.right
+                            w = x.parent!.right
                         }
-                        w!.color = x.parent!.color
-                        x!.parent!.color = Color.BLACK
-                        w!.right!.color = Color.BLACK
-                        this.rotationLeft(x!.parent)
+
+                        if (w) {
+                            w!.color = x.parent!.color
+                            x.parent!.color = Color.BLACK
+                            w!.right!.color = Color.BLACK
+                            this.rotationLeft(x.parent)
+                        }
+                        
                         x = this.root!
                     }
                 } else {
                     let w = x.parent!.left
-                    if (w!.color === Color.RED) {
+
+                    if(this.isRed(w)) {
                         w!.color = Color.BLACK
-                        x!.parent!.color = Color.BLACK
-                        this.rotationRight(x!.parent)
+                        x.parent!.color = Color.BLACK
+                        this.rotationRight(x.parent)
                         w = x.parent!.left
                     }
-                    if (w!.right!.color === Color.BLACK && w!.left!.color == Color.BLACK) {
+
+                    if(w && this.isBlack(w!.right) && this.isBlack(w!.left)){
                         w!.color = Color.RED
-                        x = x!.parent!
+                        x = x.parent!
                     } else {
-                        if (w!.left!.color == Color.BLACK) {
+                        if (w && this.isBlack(w!.left)) {
                             w!.right!.color = Color.BLACK
                             w!.color = Color.RED
                             this.rotationLeft(w)
                             w = x.parent!.left
                         }
-                        w!.color = x.parent!.color
-                        x!.parent!.color = Color.BLACK
-                        w!.left!.color = Color.BLACK
-                        this.rotationRight(x!.parent)
+
+                        if (w) {
+                            w!.color = x.parent!.color
+                            x.parent!.color = Color.BLACK
+                            w!.left!.color = Color.BLACK
+                            this.rotationRight(x.parent)
+                        }
                         x = this.root!
                     }
                 }
-            x!.color = Color.BLACK
+            }
+            x.color = Color.BLACK;
         }
         private transplat(u: INodeRedBlack<T>, v: INodeRedBlack<T>) {
-            if (!u.parent)
+            if (u.parent == null)
                 this.root = v
-            else if (u === u.parent.left)
+
+            else if(u == u.parent.left)
                 u.parent.left = v
             else
                 u.parent.right = v
+
+            if(v!=null) 
+                v.parent = u.parent
         }
         private remove(z: INodeRedBlack<T>) {
             let y: any = z,
-            ycolor = z.color,
+            yoc = z.color, // y's original color
             x
-            if (!z.left) {
+
+            if(z.left==null) {
                 x = z.right
-                this.transplat(z, z.right!)
-            } else if (!z.right) {
+                this.transplat(z,z.right!)
+            } else if(z.right==null) {
                 x = z.left
-                this.transplat(z, z.left)
+                this.transplat(z,z.left)
             } else {
                 y = this.min(z.right)
-                ycolor = y.color
+                yoc = y.color
                 x = y.right
-                if (y.parent == z)
-                    x!.parent = y
+
+                if(x && y.parent==z)
+                    x.parent = y
                 else {
-                    this.transplat(y, y.right!)
+                    this.transplat(y,y.right)
                     y.right = z.right
-                    y.right.parent = y
+                    if (y.right) y.right.parent = y
                 }
-                this.transplat(z, y)
+                this.transplat(z,y)
                 y.left = z.left
                 y.left.parent = y
                 y.color = z.color
             }
-            if (ycolor == Color.BLACK)
-                this.remove_fixup(x!)
+
+            if(yoc==Color.BLACK)
+                this.remove_fixup(x)
+
         }
         del(v: T): TreeRedBlack<T> {
-            let x = this.root,
-                x_cmp;
-            // debugger
-            while (x) {
-                x_cmp = this.cmp(x.value)
-                if (v < x_cmp)
-                    x = x.left
-                else if (v > x_cmp)
-                    x = x.right
-                else
-                    break
-            }
+            let x: any = this.find(v)
+            
             if (x) {
+                // debugger
                 this.remove(x)
                 this._size--
-            } // else console.warn(`${v} no se encuentra`)// throw `${value} ya se encuetra almacenado!`
+            }
             return this
         }
         size(): number {
